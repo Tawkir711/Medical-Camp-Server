@@ -27,6 +27,24 @@ async function run() {
     // await client.connect();
 
     const addCampCollection = client.db('MedicalCamp').collection('addCamp');
+    const userCollection = client.db('MedicalCamp').collection('users');
+
+
+
+    // user related item
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email }
+      const existingUser = await userCollection.findOne(query)
+      if (existingUser) {
+        return res.send({message: 'User Already Exists', insertedId: null})
+      }
+      const result = await userCollection.insertOne(user)
+      res.send(result);
+    })
+
+
+    // Add Camp Related Item ...
 
     app.get('/addCamp', async (req, res) => {
       const result = await addCampCollection.find().toArray();
