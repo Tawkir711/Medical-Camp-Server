@@ -33,6 +33,13 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/addCamp/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await addCampCollection.findOne(query)
+      res.send(result);
+    })
+
     app.post('/addCamp', async (req, res) => {
       const item = req.body;
       const result = await addCampCollection.insertOne(item);
