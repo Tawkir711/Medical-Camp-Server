@@ -46,6 +46,27 @@ async function run() {
       res.send(result);
     })
 
+    app.patch('/addCamp/:id', async (req, res) => {
+      const item = req.body;
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          name: item.name,
+          date: item.date,
+          audience: item.audience,
+          fees: item.fees,
+          health: item.health,
+          location: item.location,
+          service: item.service,
+          description: item.description,
+          image: item.image
+        }
+      }
+      const result = await addCampCollection.updateOne(filter, updateDoc)
+      res.send(result);
+    })
+
     app.delete('/addCamp/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
