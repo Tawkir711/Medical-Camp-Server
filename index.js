@@ -52,6 +52,10 @@ async function run() {
 
 
     // join camp related api item
+    app.get('/joinCamp', async (req, res) => {
+      const result = await joinCampCollection.find().toArray();
+      res.send(result);
+    })
 
     app.post('/joinCamp', async (req, res) => {
       const item = req.body;
