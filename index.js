@@ -28,6 +28,7 @@ async function run() {
 
     const addCampCollection = client.db('MedicalCamp').collection('addCamp');
     const userCollection = client.db('MedicalCamp').collection('users');
+    const joinCampCollection = client.db('MedicalCamp').collection('joinCamp');
 
 
 
@@ -48,6 +49,16 @@ async function run() {
       const result = await userCollection.insertOne(user)
       res.send(result);
     })
+
+
+    // join camp related api item
+
+    app.post('/joinCamp', async (req, res) => {
+      const item = req.body;
+      const result = await joinCampCollection.insertOne(item);
+      res.send(result);
+    })
+
 
 
     // Add Camp Related Item ...
