@@ -138,6 +138,8 @@ async function run() {
       res.send(result);
     })
 
+    
+
     app.post('/joinCamp', async (req, res) => {
       const item = req.body;
       const result = await joinCampCollection.insertOne(item);
@@ -152,6 +154,18 @@ async function run() {
       const { email } = req.query;
       const query = {userEmail: email}
       const result = await addCampCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    app.get('/addCamp/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await addCampCollection.findOne(query)
+      res.send(result);
+    })
+
+    app.get('/addCampAll', async (req, res) => {
+      const result = await addCampCollection.find().toArray();
       res.send(result);
     })
 
