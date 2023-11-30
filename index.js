@@ -57,15 +57,35 @@ async function run() {
     }
 
 
+    // use verify Organizer 
+    const verifyOrganizer = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const isAdmin = user?.role === 'organizer';
+      if (!isAdmin) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      next();
+    }
+
+
     // user related item
 
-    app.get('/users', verifyToken, async (req, res) => {
+    app.get('/users', verifyToken, verifyOrganizer, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     })
 
 
-    app.get('/users/admin/:email', verifyToken, async (req, res) => {
+    app.get('/userRole/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email }
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    })
+
+    app.get('/users/organizer/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
         return res.status(403).send({ message: 'forbidden access' })
@@ -73,11 +93,11 @@ async function run() {
 
       const query = { email: email };
       const user = await userCollection.findOne(query);
-      let admin = false;
+      let organizer = false;
       if (user) {
-        admin = user?.role === 'admin';
+        organizer = user?.role === 'organizer';
       }
-      res.send({ admin });
+      res.send({ organizer });
     })
 
     app.post('/users', async (req, res) => {
@@ -91,19 +111,20 @@ async function run() {
       res.send(result);
     })
 
-    app.patch('/users/admin/:id', async (req, res) => {
+    app.patch('/users/organizer/:id', verifyToken, verifyOrganizer, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          role: 'admin'
+          role: 'organizer'
         }
       }
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+    
 
-    app.delete('/users/:id', async (req, res) => {
+    app.delete('/users/:id',verifyToken, verifyOrganizer, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await userCollection.deleteOne(query);
@@ -128,7 +149,9 @@ async function run() {
     // Add Camp Related Item ...
 
     app.get('/addCamp', async (req, res) => {
-      const result = await addCampCollection.find().toArray();
+      const { email } = req.query;
+      const query = {userEmail: email}
+      const result = await addCampCollection.find(query).toArray();
       res.send(result);
     })
 
